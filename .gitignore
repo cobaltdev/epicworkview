@@ -1,0 +1,29 @@
+# Generated depencies
+node_modules/
+
+# Target folder
+target/
+
+# Emacs temporary files
+*.*~
+*~
+
+# Finder file
+.DS_Store
+
+# Java class files
+*.class
+
+# Vi Temporary files
+*.swp
+
+# Eclipse files
+.classpath
+.settings
+.project
+
+# Prefixed files
+*.prefixed.css
+
+# Atlassian Readme
+README

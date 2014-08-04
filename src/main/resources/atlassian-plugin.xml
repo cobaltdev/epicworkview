@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<atlassian-plugin key="${project.groupId}.${project.artifactId}" name="${project.name}" plugins-version="2">
+  <plugin-info>
+    <description>${project.description}</description>
+    <version>${project.version}</version>
+    <vendor name="${project.organization.name}" url="${project.organization.url}"/>
+    <param name="plugin-icon">images/pluginIcon.png</param>
+    <param name="plugin-logo">images/pluginLogo.png</param>
+  </plugin-info>
+  <!-- add our i18n resource -->
+  <resource type="i18n" name="i18n" location="EpicPlugin"/>
+  <!-- add our web resources -->
+  <web-resource key="EpicPlugin-resources" name="EpicPlugin Web Resources">
+    <dependency>com.atlassian.auiplugin:ajs</dependency>
+    <resource type="download" name="EpicPlugin.prefixed.css" location="/css/EpicPlugin.prefixed.css"/>
+    <resource type="download" name="EpicPlugin.js" location="/js/EpicPlugin.js"/>
+    <resource type="download" name="images/" location="/images"/>
+    <context>EpicPlugin</context>
+  </web-resource>
+  <web-resource key="EpicDetails-resources" name="EpicDetails Web Resources">
+    <dependency>com.atlassian.auiplugin:ajs</dependency>
+    <resource type="download" name="EpicDetails.prefixed.css" location="/css/EpicDetails.prefixed.css"/>
+    <resource type="download" name="EpicDetails.js" location="/js/EpicDetails.js"/>
+      <resource type="download" name="jquery.flot.min.js" location="/js/jquery.flot.min.js"/>
+    <resource type="download" name="images/" location="/images"/>
+    <context>EpicDetails</context>
+  </web-resource>
+  <!-- publish our component -->
+  <servlet name="EpicPlugin" class="com.cobalt.jira.plugin.epic.EpicRadiator" key="epic">
+    <url-pattern>/epic</url-pattern>
+  </servlet>
+  <servlet name="DetailedEpicView" class="com.cobalt.jira.plugin.epic.details.EpicDetails" key="epicDetails">
+    <url-pattern>/epicDetails</url-pattern>
+  </servlet>
+  <!-- import from the product container -->
+  <component-import key="applicationProperties" interface="com.atlassian.sal.api.ApplicationProperties"/>
+  <component-import key="templateRenderer" interface="com.atlassian.templaterenderer.TemplateRenderer" filter=""/>
+  <component-import key="userManager" interface="com.atlassian.sal.api.user.UserManager" filter=""/>
+  <component-import key="loginUriProvider" interface="com.atlassian.sal.api.auth.LoginUriProvider" filter=""/>
+  <component-import key="pluginSettingsFactory" interface="com.atlassian.sal.api.pluginsettings.PluginSettingsFactory" filter=""/>
+  <component-import key="projectManager" interface="com.atlassian.sal.api.project.ProjectManager" filter=""/>
+  <component-import key="eventPublisher" interface="com.atlassian.event.api.EventPublisher" filter=""/>
+
+  <component key="jiraDataManager" class="com.cobalt.jira.plugin.epic.data.DataManager">
+    <interface>com.cobalt.jira.plugin.epic.data.DataManager</interface>
+  </component>
+
+  <web-item name="Epic" i18n-name-key="epic-plugin.name" key="epic-plugin" section="system.top.navigation.bar" weight="1000">
+    <description key="epic-plugin.description">The Epic Plugin Plugin</description>
+    <label key="epic-plugin.label"/>
+    <tooltip key="epic-plugin.tip"/>
+    <link linkId="epic-plugin-link">/plugins/servlet/epic</link>
+  </web-item>
+
+  <rest name="Rest Resource" i18n-name-key="rest-project-resource.name" key="rest-project-resource" path="/epic" version="1">
+    <description key="rest-project-resource.description">The Rest Project Resource Plugin</description>
+  </rest>
+</atlassian-plugin>
