@@ -5,7 +5,9 @@ import com.atlassian.jira.avatar.Avatar;
 import com.atlassian.jira.avatar.AvatarService;
 import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.user.ApplicationUser;
-import com.cobalt.jira.plugin.epic.data.*;
+import com.cobalt.jira.plugin.epic.data.IEpicData;
+import com.cobalt.jira.plugin.epic.data.IJiraData;
+import com.cobalt.jira.plugin.epic.data.IProjectData;
 
 import java.util.List;
 
@@ -14,62 +16,54 @@ public class JaxbFactory {
     private JaxbFactory() {
     }
 
-    public static JaxbProject newJaxbProject(IJiraData p, List<JaxbEpic> epics) {
+    public static JaxbProject newJaxbProject(IJiraData p, List<? extends JaxbIssue> epics) {
         String category = "No Category";
         String icon = "";
         if(p instanceof IProjectData) {
             category = ((IProjectData)p).getGroup();
             icon = ((IProjectData)p).getProjectIcon();
         }
-        return newJaxbProject(p.getName(), p.getKey(), p.getId(), p.getDescription(), p.getDisplayTimestamp(), newJaxbUser(p.getAssignee()), category, icon, epics);
+        long timestamp = p.getDisplayTimestamp();
+        return newJaxbProject(p.getName(), p.getKey(), p.getId(), p.getDescription(), timestamp, newJaxbUser(p.getAssignee(), timestamp), category, icon, epics);
     }
 
-    public static JaxbProject newJaxbProject(String name, String key, long id, String description, long timestamp, JaxbUser assignee, String category, String icon, List<JaxbEpic> epics) {
+    public static JaxbProject newJaxbProject(String name, String key, long id, String description, long timestamp, JaxbUser assignee, String category, String icon, List<? extends JaxbIssue> epics) {
         JaxbProject jaxbProject = new JaxbProject();
         setData(jaxbProject, name, key, id, description, timestamp, assignee);
-        jaxbProject.epics = epics;
+        jaxbProject.children = epics;
         jaxbProject.group = category;
         jaxbProject.icon = icon;
         return jaxbProject;
     }
 
-    public static JaxbEpic newJaxbEpic(IJiraData e, List<JaxbStory> stories) {
+    public static JaxbEpic newJaxbEpic(IJiraData e, List<? extends JaxbIssue> stories) {
         String color = "#fdf4bb";
         if(e instanceof IEpicData) {
             color = ((IEpicData)e).getColor();
         }
-
-        return newJaxbEpic(e.getName(), e.getKey(), e.getId(), e.getDescription(), e.getDisplayTimestamp(), newJaxbUser(e.getAssignee()), color, stories);
+        long timestamp = e.getDisplayTimestamp();
+        return newJaxbEpic(e.getName(), e.getKey(), e.getId(), e.getDescription(), timestamp, newJaxbUser(e.getAssignee(), timestamp), color, stories);
     }
 
-    public static JaxbEpic newJaxbEpic(String name, String key, long id, String description, long timestamp, JaxbUser assignee, String color, List<JaxbStory> stories) {
+    public static JaxbEpic newJaxbEpic(String name, String key, long id, String description, long timestamp, JaxbUser assignee, String color, List<? extends JaxbIssue> stories) {
         JaxbEpic jaxbEpic = new JaxbEpic();
         setData(jaxbEpic, name, key, id, description, timestamp, assignee);
-        jaxbEpic.stories = stories;
+        jaxbEpic.children = stories;
         jaxbEpic.color = color;
         return jaxbEpic;
     }
 
-    public static JaxbStory newJaxbStory(IJiraData s, List<JaxbIssue> subtasks) {
-        return newJaxbStory(s.getName(), s.getKey(), s.getId(), s.getDescription(), s.getDisplayTimestamp(), newJaxbUser(s.getAssignee()), s.completed(), subtasks);
+    public static JaxbStory newJaxbStory(IJiraData s, List<JaxbUser> contributors) {
+        long timestamp = s.getDisplayTimestamp();
+        return newJaxbStory(s.getName(), s.getKey(), s.getId(), s.getDescription(), timestamp, newJaxbUser(s.getAssignee(), timestamp), s.completed(), contributors);
     }
 
-    public static JaxbStory newJaxbStory(String name, String key, long id, String description, long timestamp, JaxbUser assignee, boolean completed, List<JaxbIssue> subtasks) {
+    public static JaxbStory newJaxbStory(String name, String key, long id, String description, long timestamp, JaxbUser assignee, boolean completed, List<JaxbUser> contributors) {
         JaxbStory jaxbStory = new JaxbStory();
         setData(jaxbStory, name, key, id, description, timestamp, assignee);
         jaxbStory.completed = completed;
-        jaxbStory.subtasks = subtasks;
+        jaxbStory.contributors = contributors;
         return jaxbStory;
-    }
-
-    public static JaxbIssue newJaxbIssue(IJiraData i) {
-        return newJaxbIssue(i.getName(), i.getKey(), i.getId(), i.getDescription(), i.getDisplayTimestamp(), newJaxbUser(i.getAssignee()));
-    }
-
-    public static JaxbIssue newJaxbIssue(String name, String key, long id, String description, long timestamp, JaxbUser assignee) {
-        JaxbIssue jaxbIssue = new JaxbIssue();
-        setData(jaxbIssue, name, key, id, description, timestamp, assignee);
-        return jaxbIssue;
     }
 
     private static void setData(JaxbIssue issue, String name, String key, long id, String description, long timestamp, JaxbUser assignee) {
@@ -81,7 +75,7 @@ public class JaxbFactory {
         issue.contributor = assignee;
     }
 
-    public static JaxbUser newJaxbUser(User assignee) {
+    public static JaxbUser newJaxbUser(User assignee, long timestamp) {
         if(assignee == null){
             return null;
         }
@@ -92,14 +86,15 @@ public class JaxbFactory {
         ApplicationUser appUser = ComponentAccessor.getUserManager().getUserByKey(key);
         String url = avatarService.getAvatarUrlNoPermCheck(appUser, Avatar.Size.LARGE).toString();
 
-        return newJaxbUser(appUser.getKey(), appUser.getDisplayName(), url);
+        return newJaxbUser(appUser.getKey(), appUser.getDisplayName(), url, timestamp);
     }
 
-    public static JaxbUser newJaxbUser(String id, String name, String avatar) {
+    public static JaxbUser newJaxbUser(String id, String name, String avatar, long timestamp) {
         JaxbUser jaxbUser = new JaxbUser();
         jaxbUser.id = id;
         jaxbUser.name = name;
         jaxbUser.avatar = avatar;
+        jaxbUser.timestamp = timestamp;
         return jaxbUser;
     }
 }

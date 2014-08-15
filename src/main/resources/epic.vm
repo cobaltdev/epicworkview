@@ -2,39 +2,37 @@
   <head>
     <title>Epics</title>
     <meta name="decorator" content="atl.general">
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.19/angular.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.19/angular-animate.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.19/angular-cookies.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
     $webResourceManager.requireResource("com.cobalt.jira.plugin.epic.EpicPlugin:EpicPlugin-resources")
     <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
     <link  href="https://fonts.googleapis.com/css?family=Reenie+Beanie:regular" rel="stylesheet" type="text/css">
-    <script type="text/javascript">
-		var myApp = angular.module('myApp', ['ngAnimate', 'ngCookies']).directive('selectonclick', directives.selectOnClick).directive('modal', directives.modal);
-    </script>
   </head>
   <body>
-    <div ng-app="myApp" ng-controller="ProjectController" ng-click="hideEpicInfo()" class="body-container unselectable">
-    	<div id="nav-bar">
-    		<ul>
+    <div ng-app="WorkView" ng-controller="workViewController" ng-click="hideEpicInfo()" class="body-container unselectable">
+    	<div id="nav-bar" ng-controller="navBarController">
+    		<ul ng-click="$event.stopPropagation()">
     			<li>
-    				<div ng-click="toggleFullScreen()">
-						<i class="fa fa-expand fa-2x" ng-class="{'fa-compress': isFullScreen}"></i>
+    				<div ng-click="toggleFullscreen()">
+						<i class="fa fa-expand fa-2x" ng-class="{'fa-compress': isFullscreen}"></i>
 					</div>
     			</li>
     		</ul>
-    		<ul>
+    		<ul ng-click="$event.stopPropagation()">
     			<li>
-    				<div ng-click="showInfoWindow=true">
+    				<div ng-click="open()">
 						<i class="fa fa-info fa-2x"></i>
 					</div>
     			</li>
     		</ul>
-    		<ul id="search-tab">
+    		<ul ng-click="$event.stopPropagation()">
     			<li>
-    				<div id="search-slideout" ng-click="cookieState()">
-    					<input type="text" ng-model="embeddedUrl" autocomplete="off" wrap="off" readonly selectonclick/>
-    					<i class="fa fa-link fa-2x"></i>
+    				<div class="btn-group dropdown-toggle" dropdown>
+    					<i class="fa fa-clock-o fa-2x"></i>
+    					<ul class="dropdown-menu" role="menu">
+				        	<li><a ng-class="{'menu-item-selected': filterDays===1}" ng-click="changeFilterDays(1)">1 day</a></li>
+				        	<li><a ng-class="{'menu-item-selected': filterDays===2}" ng-click="changeFilterDays(2)">2 days</a></li>
+				        	<li><a ng-class="{'menu-item-selected': filterDays===7}" ng-click="changeFilterDays(7)">7 days</a></li>
+				        	<li><a ng-class="{'menu-item-selected': filterDays===14}" ng-click="changeFilterDays(14)">14 days</a></li>
+				      	</ul>
     				</div>
     			</li>
     		</ul>
@@ -45,15 +43,14 @@
     					<i class="fa fa-search fa-2x"></i>
     					<div id="search-dropdown" style="background-color: #ebf2f9;">
     						<div style="text-align: center; padding-top: 5px;">
-    							<button id="Clear button" ng-click="clearchkbox()">Clear</button>
-				    			<button id="Checkall button" ng-click="checkchkbox()">Check All</button>
+    							<button id="Clear button" ng-click="clearCheckboxes()">Clear</button>
+				    			<button id="Checkall button" ng-click="checkCheckboxes()">Check All</button>
 				    		</div>
 				    		<div class="aui-list-scroll" style="display: block; width: 180px;">
 				    			<ul class="list-section">
-				    				<li ng-repeat="project in (filteredProjects = (alphabeticalProjects() | filter:search))" class="check-list-item repeat-item">
+				    				<li ng-repeat="project in (filteredProjects = (projects | filter:search))" class="check-list-item repeat-item">
 				    					<label class="item-label" title="{{project.name}}">
-				    						<span id="mycheckboxState" style="display:none;" hidden>{{project.included}}</span>
-				    						<input id="mycheckbox" type="checkbox" ng-click="checkProject(project)" ng-init="project.included=project.state" ng-model='project.included'/>
+				    						<input id="mycheckbox" type="checkbox" ng-change="checkProject(project)" ng-model='project.included'/>
 				    						{{project.name}}
 				    					</label>
 				    				</li>
@@ -68,101 +65,85 @@
     	<!-- scroll-to-top button --> 
 		<a href="" id="scroll-to-top"><i class="fa fa-angle-up fa-2x"></i></a>
 
-    	<div id="top-bar" ng-show="isFullScreen"></div>
-	    <ul id="projects" class="list-section">
-	      <li class=table-header ng-class="{'fixed-header': isFullScreen}">
-	        <ul class="inline">
-	          <li class="project-column">
-	          	<span>Projects</span>
-	          </li>
-	          <li class="contributor-column">Contributors</li>
-	          <li class="completed-story-column">Stories Completed</li>
-	          <li class="last-update-column">Last Update 
-	          	<select ng-show="!isFullScreen" ng-model='filterDays' ng-change='loading=true; hideEpicInfo(); getProjects(filterDays * 24 * 60 * 60)'>
-  					<option value="1">1 day</option>
- 				 	<option value="2">2 days</option>
-  					<option value="7">7 days</option>
-  					<option value="14">14 days</option>
-				</select>
-	          </li>
-	        <li class="epic-column">Epics</li>
-	      </ul>
-	      </li>
-	      	<li class="loading-bar" ng-show="loading">
-	      		<i class="fa fa-circle-o-notch fa-spin fa-4x"></i>
-	      	</li>
-	      	<li class="table-body" ng-hide="loading" ng-class="{'fixed-body': isFullScreen}">
-		      <div class="project-row table-row" ng-repeat="project in timeOrderedProjects() | filter: {included:true}">
-		      	<ul class="inline">
-		      		<li class="project-column">	
-		      			<img class="project-icon" src="{{project.icon}}" height="40" width="40">	      					      			
-		      			<div class="project-info">
-			      			<span class="project-group">{{project.group}}</span>
-			      			<span>
-			      				<a class="project-name" ng-click="setActivePage(project)">{{project.name}}</a>
-			      			</span>   					     						      			
-			      		</div>
-		      		</li>
-		      		<li class="contributor-column">
-		      			<ul class="list inline">
-		      				<li class="contributor" ng-repeat="contributor in getContributors(project)">
-		      					<img class="contributor-image" src="{{contributor.avatar}}" title="{{contributor.name}}" ng-click="setActiveUser(contributor.id)" height="32" width="32">
-		      				</li>
-		      				<li class="extra-contributors" ng-show="extraContributorCount(project) > 1"><span>+{{extraContributorCount(project)}}</span></li>
-		      			</ul>
-		      		</li>
-		      		<li class="completed-story-column">{{getCompletedStories(project)}}</li>
-		      		<li class="last-update-column">{{millisecondToString(project.timestamp, false)}} ago</li>
-		      		<li class="epic-column">
-		      			<ul class="list inline" ng-controller="EpicController">
-		      				<li class="epic-container" ng-repeat="epic in project.epics" ng-init="setUniqueId(epic)" ng-class="{'clicked-epic': isClicked(epic.id)}" ng-click="toggleEpic($event, epic.id)">
-		      					<div class="post-it" ng-repeat="padding in getPostItOffsets(shorten(epic.name))" ng-style="{'left': '{{padding}}px', 'background': '{{getEpicColor(epic)}}'}" ng-class="getEpicColor(epic)"></div>
-		      					<div class="post-it" ng-repeat="padding in getPostItOffsets(shorten(epic.name))" ng-style="{'right': '{{padding}}px', 'background': '{{getEpicColor(epic)}}'}" ng-class="getEpicColor(epic)"></div>
-		      					<span class="epic" ng-style="{'background-color': '{{getEpicColor(epic)}}'}" ng-class="getEpicColor(epic)">
-		      						{{shorten(epic.name)}}
-		      					</span>
-		      				</li>
-		      			</ul>
-		      		</li>
-		      	</ul>
-		      	<div class="epic-info" ng-controller="EpicController" ng-show="showEpicWindow(project)" ng-click="$event.stopPropagation()">
-		      		<ul class="in-progress-stories list-section inline">
-		      			<li class="story" ng-repeat="story in getEpicStories(project, false)">
-		      				<div ng-style="{'background': '{{getClickedEpicColor(project)}}'}" ng-class="getClickedEpicColor(project)">
-			      				<ul ng-style="{'border-bottom-color': '{{getFontColor()}}'}" class="story-header list-section">
-			      					<li class="contributor-holder"><img class="contributor-image" ng-show="story.contributor" src="{{story.contributor.avatar}}" 
-			      							 title="{{story.contributor.name}}" height="24" width="24"></li>
-			      					<li>{{millisecondToString(story.timestamp, true)}}</li>
-			      					<li><i class="fa fa-info-circle info-button" ng-click="setActivePage(story)"></i></li>			      							
-			      				</ul>
-			      				<span class="checkmark" ng-show="story.completed">&#x2713;</span>
-			      				<p>{{story.name}}</p>
-			      			</div>
-		      			</li>
-		      		</ul>
-		      		<ul class="in-progress-stories list-section inline">
-		      			<li class="story" ng-repeat="story in getEpicStories(project, true)">
-		      				<div ng-style="{'background': '{{getClickedEpicColor(project)}}'}" ng-class="getClickedEpicColor(project)">
-			      				<ul ng-style="{'border-bottom-color': '{{getFontColor()}}'}" class="story-header list-section">
-			      					<li class="contributor-holder"><img class="contributor-image" ng-show="story.contributor" src="{{story.contributor.avatar}}" 
-			      							 title="{{story.contributor.name}}" height="24" width="24"></li>
-			      					<li>{{millisecondToString(story.timestamp, true)}}</li>
-			      					<li><i class="fa fa-info-circle info-button" ng-click="setActivePage(story)"></i></li>			      							
-			      				</ul>
-			      				<span class="checkmark" ng-show="story.completed">&#x2713;</span>
-			      				<p>{{story.name}}</p>
-			      			</div>
-		      			</li>
-		      		</ul>		      	
+		<div class="loading-bar" ng-show="loading">
+	      	<i class="fa fa-circle-o-notch fa-spin fa-4x"></i>
+	   	</div>
+		
+	    <ul id="projects" class="list-section project-list" ng-show="!loading">
+	      	<li class="project-row" ng-repeat="project in projects | filter: {included:true}" ng-controller="projectController">
+		   		<div class="project-content">
+		   			<div class="column1">
+			   			<div class="project-icon-container">
+				    		<img class="project-icon" ng-src="{{project.icon}}" height="48" width="48">
+				      	</div>
+				      	<div class="project-info-container">
+					      	<span class="project-group">{{project.group}}</span>
+					     	<span>
+					      		<a class="project-name" ng-click="setActivePage(project)">{{project.name}}</a>
+					      	</span>   					     						      			
+					    </div>
+					    <div class="last-update-container">
+				      		<div class="content">
+				      			<span>updated {{millisecondToString(project.timestamp, false)[0]}} {{millisecondToString(project.timestamp, false)[1]}} ago</span>
+				      		</div>
+				      	</div>
+					</div>
+				    <div class="column2">
+				      	<div class="completed-story-container">
+				      		<span class="header">STORIES COMPLETED</span>
+				      		<div class="content">
+				      			<span class="bold">{{getCompletedStories(project)}}</span>
+				      			<span>in last {{getFilterDays()}} {{pluralize(getFilterDays(), "day")[1]}}</span>
+				      		</div>
+				      	</div>
+				   	</div>
+				   	<div class="column3">
+				     	<div class="contributor-container">
+				      		<ul class="list inline">
+				      			<li class="contributor" ng-repeat="contributor in getContributors(project)">
+				      				<img class="contributor-image" ng-src="{{contributor.avatar}}" tooltip="{{contributor.name}}" ng-click="setActiveUser(contributor.id)" height="36" width="36">
+				      			</li>
+				      			<li class="extra-contributors" ng-show="extraContributorCount(project) > 1"><span>+{{extraContributorCount(project)}}</span></li>
+				      		</ul>
+				      	</div>
+				      	<div class="epic-list-container">
+				      		<ul class="list inline">
+				      			<li class="epic-holder" ng-repeat="epic in project.children" >
+				      				<div class="epic-info-button" ng-show="isClicked(epic) && !animating" ng-click="$event.stopPropagation(); setActiveEpic(epic, project)">
+					      				<i class="fa fa-info fa-2x"></i>
+					      			</div>
+				      				<div class="epic-container" ng-class="{'clicked-epic': isClicked(epic)}" ng-click="toggleEpic($event, epic)">
+					      				<div class="post-it" ng-repeat="padding in getPostItOffsets(shorten(epic.name))" ng-style="{'left': '{{padding}}px', 'background': '{{translateColor(epic.color)}}'}" ng-class="translateColor(epic.color)"></div>
+					      				<div class="post-it" ng-repeat="padding in getPostItOffsets(shorten(epic.name))" ng-style="{'right': '{{padding}}px', 'background': '{{translateColor(epic.color)}}'}" ng-class="translateColor(epic.color)"></div>
+					      				<span class="epic" ng-style="{'background-color': '{{translateColor(epic.color)}}'}" ng-class="translateColor(epic.color)">
+					      					{{shorten(epic.name)}}
+					      				</span>
+				      				</div>
+				      			</li>	
+				      		</ul>
+				      	</div>
+				   	</div>
+			      	<div class="epic-info" ng-show="showEpicInfo(project)" ng-click="$event.stopPropagation()">
+			      		<ul class="story-list list-section inline" ng-repeat="completed in [false, true]">
+			      			<li class="story" ng-class="{'animate-story': storyIsAnimated(story.id)}" ng-repeat="story in getStories(completed)">
+			      				<div ng-style="{'background': '{{translateColor(clickedEpic.color)}}'}" ng-class="translateColor(clickedEpic.color)">
+				      				<ul ng-style="{'border-bottom-color': '{{getFontColor()}}'}" class="story-header list-section">
+				      					<li class="contributor-holder"><img class="contributor-image" ng-show="story.contributor" ng-src="{{story.contributor.avatar}}" 
+				      							 title="{{story.contributor.name}}" height="24" width="24"></li>
+				      					<li>{{millisecondToString(story.timestamp, true)[0]}}{{millisecondToString(story.timestamp, true)[1]}}</li>
+				      					<li><i class="fa fa-info-circle info-button" ng-click="setActivePage(story)"></i></li>			      							
+				      				</ul>
+				      				<span class="checkmark" ng-show="story.completed">&#x2713;</span>
+				      				<p>{{story.name}}</p>
+				      			</div>
+			      			</li>
+			      		</ul>		      	
+			      	</div>
 		      	</div>
-		      </div>
 		 	</li>
     	</ul>
-    	<modal ng-show="getShowWindow()" ng-click="setShowWindow(false)">
-			<iframe src="{{url}}"></iframe>
-  		</modal>
-  		<modal ng-show="showInfoWindow" ng-click="showInfoWindow=false">
-			<div class="info-window" ng-click="$event.stopPropagation()">
+		<script type="text/ng-template" id="info.html">
+			<div class="info-window">
 				<h1>Epic Work View for JIRA</h1>
 				<h2>Overview</h2>
 				<p>Epic Work View displays information about the work in progress on projects, epics and stories. </p>
@@ -174,9 +155,13 @@
 				and while in fullscreen mode, will open all windows within the display instead of navigating away from the page. </p>
 				<h2>Project Filtering</h2>
 				<p>Projects can be filtered by name or project group. Project filters are remembered across sessions on a 
-				user's computer. To share a link with a given filter, copy the text from the link button in the navigation bar. </p>
+				user's computer. To share a specific filter with another computer, simply copy the url. </p>
+				<h2>Epic Details Page</h2>
+				<p>To view more details about an epic, click on the information button that appears on top of the epic you are
+				currently viewing. The epic details page displays displays a list of stories, a progress bar for the epic, and
+				a chart showing story creation and completion with a forecasted completion date for the epic. </p>
 			</div>
-  		</modal>
+		</script>
     </div>
   </body>
 </html>

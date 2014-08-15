@@ -8,7 +8,7 @@ module.exports = function(grunt) {
                 ]
             },
             all: [
-                'src/main/resources/js/*.js'
+                'src/main/resources/js/**/*.js'
             ]
         },
         //Interface with the Karma test runner
@@ -45,17 +45,37 @@ module.exports = function(grunt) {
                 src: 'src/main/resources/css/EpicDetails.css',
                 dest: 'src/main/resources/css/EpicDetails.prefixed.css'
             }
+        },
+        watch: {
+            grunt: {
+                files: 'Gruntfile.js',
+                options: {
+                    reload: true
+                }
+            },
+            css: {
+                files: ['src/main/resources/css/*.css', '!src/main/resources/css/*.prefixed.css'],
+                tasks: ['autoprefix']
+            },
+            js: {
+                files: ['src/main/resources/js/*.js'],
+                tasks: ['karma:unit', 'jshint']
+            }
         }
     });
 
     grunt.loadNpmTasks('grunt-contrib-jshint');
+    grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-karma');
     grunt.loadNpmTasks('grunt-protractor-runner');
     grunt.loadNpmTasks('grunt-autoprefixer');
+    grunt.loadNpmTasks('grunt-istanbul');
 
     grunt.registerTask('default', []);
-    grunt.registerTask('ut', [/*'karma:unit',*/ 'jshint', 'autoprefixer']);
+    grunt.registerTask('ut', [/*'karma:unit', */'jshint', 'autoprefixer']);
     grunt.registerTask('it', ['protractor']);
     grunt.registerTask('autoprefix', ['autoprefixer']);
     grunt.registerTask('lint', ['jshint']);
+
+    grunt.registerTask('karmaTest', ['karma:unit']);
 };

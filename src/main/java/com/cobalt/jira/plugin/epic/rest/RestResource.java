@@ -1,14 +1,7 @@
 package com.cobalt.jira.plugin.epic.rest;
 
 import com.atlassian.crowd.embedded.api.User;
-import com.atlassian.event.api.EventListener;
-import com.atlassian.event.api.EventPublisher;
-import com.atlassian.jira.bc.issue.search.SearchService;
-import com.atlassian.jira.bc.project.ProjectService;
-import com.atlassian.jira.event.ProjectUpdatedEvent;
-import com.atlassian.jira.event.issue.IssueEvent;
 import com.atlassian.jira.user.ApplicationUser;
-import com.atlassian.jira.user.util.UserUtil;
 import com.atlassian.plugins.rest.common.security.AnonymousAllowed;
 import com.atlassian.sal.api.user.UserManager;
 import com.atlassian.sal.api.user.UserProfile;
@@ -17,13 +10,13 @@ import com.cobalt.jira.plugin.epic.data.IJiraData;
 import com.cobalt.jira.plugin.epic.data.JiraDataType;
 import com.cobalt.jira.plugin.epic.data.NaryTree;
 import com.cobalt.jira.plugin.epic.rest.jaxb.*;
-import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 
-import javax.annotation.PreDestroy;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 
@@ -118,12 +111,21 @@ public class RestResource implements InitializingBean {
         input.remove(0);
 
         //if were down to subtasks build the jaxb and return it
-        if(data.getType() == JiraDataType.SUBTASK) {
-            output.add((T) JaxbFactory.newJaxbIssue(data));
+        if(data.getType() == JiraDataType.STORY) {
+            List<JaxbUser> users = new ArrayList<JaxbUser>();
+            while(input.size() > 0 && input.get(0).getType().compareTo(JiraDataType.STORY) > 0) {
+                IJiraData subtask = input.get(0);
+                input.remove(0);
+                User user = subtask.getAssignee();
+                if(user != null) {
+                    users.add(JaxbFactory.newJaxbUser(user, subtask.getDisplayTimestamp()));
+                }
+            }
+            output.add((T)JaxbFactory.newJaxbStory(data, users));
         }
         else {
             //make a new list to build up based on our current data type
-            List temp;
+            List<? extends JaxbIssue> temp;
             switch(data.getType()) {
             case PROJECT:
                 temp = new ArrayList<JaxbEpic>();
@@ -131,11 +133,8 @@ public class RestResource implements InitializingBean {
             case EPIC:
                 temp = new ArrayList<JaxbStory>();
                 break;
-            case STORY:
-                temp = new ArrayList<JaxbIssue>();
-                break;
             default:
-                return;//should never get here
+                throw new IllegalArgumentException("data.getType() returned an invalid enum value");
             }
 
             //while the next element is a subtype of data
@@ -146,16 +145,13 @@ public class RestResource implements InitializingBean {
             //after build up all the sub types into a list create a new jaxb object of the current type
             switch(data.getType()) {
             case PROJECT:
-                output.add((T) JaxbFactory.newJaxbProject(data, temp));
+                output.add((T)JaxbFactory.newJaxbProject(data, temp));
                 break;
             case EPIC:
-                output.add((T) JaxbFactory.newJaxbEpic(data, temp));
-                break;
-            case STORY:
-                output.add((T) JaxbFactory.newJaxbStory(data, temp));
+                output.add((T)JaxbFactory.newJaxbEpic(data, temp));
                 break;
             default:
-                return;//should never get here
+                throw new IllegalArgumentException("data.getType() returned an invalid enum value");
             }
         }
     }

@@ -172,7 +172,9 @@
 	border-style: solid;
 	border-color: #e5e5e5;
 	background: #fff;
-	transform: rotate(45deg);
+	-webkit-transform: rotate(45deg);
+	    -ms-transform: rotate(45deg);
+	        transform: rotate(45deg);
 }
 
 .comment-img {

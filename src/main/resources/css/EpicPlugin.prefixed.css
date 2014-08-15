@@ -33,7 +33,8 @@
 }
 
 #nav-bar > ul > li > div {
-	transition: width 0.4s ease-in-out, background 0.2s ease-in-out;
+	-webkit-transition: width 0.4s ease-in-out, background 0.2s ease-in-out;
+	        transition: width 0.4s ease-in-out, background 0.2s ease-in-out;
 
 	background-color: #ebf2f9;
 
@@ -71,13 +72,18 @@
 #search-tab {
 	position: relative;
 
-	transition: width 0.4s ease-in-out;
+	-webkit-transition: width 0.4s ease-in-out;
 
-    transition-delay: 0.4s;
+	        transition: width 0.4s ease-in-out;
+
+    -webkit-transition-delay: 0.4s;
+
+            transition-delay: 0.4s;
 }
 
 #search-slideout {
-    transition-delay: 0.4s;
+    -webkit-transition-delay: 0.4s;
+            transition-delay: 0.4s;
 }
 
 #search-slideout > input {
@@ -91,22 +97,30 @@
 	font-size: 14pt;
 	border-radius: 5px;
 
-	transition: width 0.4s ease-in-out;
+	-webkit-transition: width 0.4s ease-in-out;
 
-    transition-delay: 0.4s;
+	        transition: width 0.4s ease-in-out;
+
+    -webkit-transition-delay: 0.4s;
+
+            transition-delay: 0.4s;
 }
 
 #search-tab:hover, #search-tab:hover li > div:hover {	
 	width: 250px;
 
-    transition-delay: 0s;
+    -webkit-transition-delay: 0s;
+
+            transition-delay: 0s;
 }
 
 #search-slideout:hover > input {
 	width: 190px;
 	display: inline !important;
 
-    transition-delay: 0s;
+    -webkit-transition-delay: 0s;
+
+            transition-delay: 0s;
 }
 
 #search-slideout > div {
@@ -119,24 +133,32 @@
 	overflow: hidden;
 	background-color: #ebf2f9;
 
-	transition: max-height 0.4s ease-in-out;
+	-webkit-transition: max-height 0.4s ease-in-out;
 
-    transition-delay: 0s;
+	        transition: max-height 0.4s ease-in-out;
+
+    -webkit-transition-delay: 0s;
+
+            transition-delay: 0s;
 }
 
 #search-slideout:hover > div {
 	display: inline;
 	max-height: 330px;
 
-    transition-delay: 0.4s;
+    -webkit-transition-delay: 0.4s;
+
+            transition-delay: 0.4s;
 }
 
 #search-slideout {
-    transition-delay: 0.4s !important;
+    -webkit-transition-delay: 0.4s !important;
+            transition-delay: 0.4s !important;
 }
 
 #search-slideout:hover {
-    transition-delay: 0s !important;
+    -webkit-transition-delay: 0s !important;
+            transition-delay: 0s !important;
 }
 
 #search-dropdown {
@@ -165,7 +187,10 @@
 }
 
 .unselectable {
-    user-select: none;
+    -webkit-user-select: none;
+       -moz-user-select: none;
+        -ms-user-select: none;
+            user-select: none;
 }
 
 .project-row {
@@ -331,7 +356,8 @@ ul.inline .epic-container {
 }
 
 .epic-info-button.ng-hide-remove {
-	transition: all .5s linear;
+	-webkit-transition: all .5s linear;
+	        transition: all .5s linear;
 }
 
 .epic-info-button:before {
@@ -346,7 +372,9 @@ ul.inline .epic-container {
 	border-color: #000;
 	background: #fff;
 	box-shadow: 3px 3px 5px #888888;
-	transform: rotate(45deg);
+	-webkit-transform: rotate(45deg);
+	    -ms-transform: rotate(45deg);
+	        transform: rotate(45deg);
 }
 
 .epic-info-button > i {
@@ -363,27 +391,42 @@ ul.inline .epic-container {
 	width: 3em;
 	bottom: -1em;
 
-    transform: rotate(-6deg);
+    -webkit-transform: rotate(-6deg);
+
+        -ms-transform: rotate(-6deg);
+
+            transform: rotate(-6deg);
 }
 
 /* "Random" tilting of stories */
 
 .post-it:nth-child(even) {
-    transform: rotate(4deg);
+    -webkit-transform: rotate(4deg);
+        -ms-transform: rotate(4deg);
+            transform: rotate(4deg);
 }
 
 .post-it:nth-child(3n) {
-    transform: rotate(-3deg);
+    -webkit-transform: rotate(-3deg);
+        -ms-transform: rotate(-3deg);
+            transform: rotate(-3deg);
 }
 
 .post-it:nth-child(5n) {
-    transform: rotate(5deg);
+    -webkit-transform: rotate(5deg);
+        -ms-transform: rotate(5deg);
+            transform: rotate(5deg);
 }
 
 .list {
 	padding-left: 0px;
+	display: -webkit-box;
+	display: -webkit-flex;
+	display: -ms-flexbox;
 	display: flex;
-	flex-wrap: wrap;
+	-webkit-flex-wrap: wrap;
+	    -ms-flex-wrap: wrap;
+	        flex-wrap: wrap;
 }
 
 .epic {
@@ -397,7 +440,9 @@ ul.inline .epic-container {
 }
 
 .clicked-epic {
-    transform: scale(1.25);
+    -webkit-transform: scale(1.25);
+        -ms-transform: scale(1.25);
+            transform: scale(1.25);
   	z-index: 4;
 }
 
@@ -506,26 +551,35 @@ input {
 	padding: 1em;
 	overflow: hidden;
 	box-shadow: 5px 5px 7px rgba(33, 33, 33, .7);
-    transform: rotate(-6deg);
-	transition: transform .15s linear;
+    -webkit-transform: rotate(-6deg);
+        -ms-transform: rotate(-6deg);
+            transform: rotate(-6deg);
+	-webkit-transition: -webkit-transform .15s linear;
+	        transition: transform .15s linear;
 }
 
 /* "Random" tilting of stories */
 
 .story:nth-child(even) div {
-    transform: rotate(4deg);
+    -webkit-transform: rotate(4deg);
+        -ms-transform: rotate(4deg);
+            transform: rotate(4deg);
   	position:relative;
   	top:5px;
 }
 
 .story:nth-child(3n) div {
-    transform: rotate(-3deg);
+    -webkit-transform: rotate(-3deg);
+        -ms-transform: rotate(-3deg);
+            transform: rotate(-3deg);
   	position:relative;
   	top:-5px;
 }
 
 story:nth-child(5n) div {
-    transform: rotate(5deg);
+    -webkit-transform: rotate(5deg);
+        -ms-transform: rotate(5deg);
+            transform: rotate(5deg);
   	position:relative;
   	top:-10px;
 }
@@ -533,17 +587,22 @@ story:nth-child(5n) div {
 /* Zooming in on stories */
 .story:hover div, .story:focus div {
   	box-shadow:10px 10px 7px rgba(0,0,0,.7);
-  	transform: scale(1.25);
+  	-webkit-transform: scale(1.25);
+  	    -ms-transform: scale(1.25);
+  	        transform: scale(1.25);
   	position:relative;
   	z-index:2;
 }
 
 .animate-story div {
 	box-shadow:10px 10px 7px rgba(0,0,0,.7) !important;
-  	transform: scale(1.25) !important;
+  	-webkit-transform: scale(1.25) !important;
+  	    -ms-transform: scale(1.25) !important;
+  	        transform: scale(1.25) !important;
   	position:relative !important;
   	z-index:2 !important;
-  	transition: transform .75s linear !important;
+  	-webkit-transition: -webkit-transform .75s linear !important;
+  	        transition: transform .75s linear !important;
 }
 
 .contributor {
@@ -573,7 +632,8 @@ story:nth-child(5n) div {
 
 .repeat-item.ng-enter,
 .repeat-item.ng-leave { 
-    transition: 400ms cubic-bezier(0.250, 0.250, 0.750, 0.750) all;
+    -webkit-transition: 400ms cubic-bezier(0.250, 0.250, 0.750, 0.750) all; 
+            transition: 400ms cubic-bezier(0.250, 0.250, 0.750, 0.750) all;
     position: relative;
     display: block;
 } 
@@ -595,7 +655,8 @@ story:nth-child(5n) div {
 /* Project row animations */
 
 .project-row.ng-move { 
-    transition: all 2s linear;
+    -webkit-transition: all 2s linear; 
+            transition: all 2s linear;
     opacity: 0;
     position: relative;
     max-height: 0px;
@@ -604,7 +665,8 @@ story:nth-child(5n) div {
 .project-row.ng-move > .project-content,
 .project-row.ng-move > .project-content:before {
 	background-color: #6C3;
-	transition: all 2s linear;
+	-webkit-transition: all 2s linear;
+	        transition: all 2s linear;
 }
 
 .project-row.ng-move.ng-move-active {

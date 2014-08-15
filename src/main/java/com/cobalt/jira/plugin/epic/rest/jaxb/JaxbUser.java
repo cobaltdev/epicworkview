@@ -1,19 +1,14 @@
 package com.cobalt.jira.plugin.epic.rest.jaxb;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
+import org.codehaus.jackson.annotate.JsonAutoDetect;
 
 
-@XmlRootElement(name = "user")
+@JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.PUBLIC_ONLY, fieldVisibility = JsonAutoDetect.Visibility.NONE)
 public class JaxbUser {
-    @XmlElement(name = "id")
     String id;
-
-    @XmlElement(name = "name")
     String name;
-
-    @XmlElement(name = "avatar")
     String avatar;
+    long timestamp;
 
     public JaxbUser() {
 
@@ -31,16 +26,12 @@ public class JaxbUser {
         return avatar;
     }
 
+    public long getTimestamp() {
+        return timestamp;
+    }
+
     public boolean equals(Object o) {
-        if(o == this) {
-            return true;
-        }
-
-        if(!(o instanceof JaxbUser)) {
-            return false;
-        }
-
-        return id.equals(((JaxbUser) o).id);
+        return o == this || (o instanceof JaxbUser && id.equals(((JaxbUser) o).id));
     }
 
     public int hashCode() {

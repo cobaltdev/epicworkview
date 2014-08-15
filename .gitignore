@@ -4,6 +4,9 @@ node_modules/
 # Target folder
 target/
 
+# Bin folder
+bin/
+
 # Emacs temporary files
 *.*~
 *~
@@ -21,9 +24,6 @@ target/
 .classpath
 .settings
 .project
-
-# Prefixed files
-*.prefixed.css
 
 # Atlassian Readme
 README
