@@ -39,7 +39,7 @@
     		<ul id="search-tab">
     			<li>
     				<div id="search-slideout">
-    					<input type="text" ng-model="query" autocomplete="off" placeholder="Find Projects..." wrap="off"/>
+    					<input type="text" ng-model="query" autocomplete="off" ng-change="initialClear()" placeholder="Find Projects..." wrap="off"/>
     					<i class="fa fa-search fa-2x"></i>
     					<div id="search-dropdown" style="background-color: #ebf2f9;">
     						<div style="text-align: center; padding-top: 5px;">
@@ -70,7 +70,43 @@
 	   	</div>
 		
 	    <ul id="projects" class="list-section project-list" ng-show="!loading">
-	      	<li class="project-row" ng-repeat="project in projects | filter: {included:true}" ng-controller="projectController">
+			<li class="project-row" ng-controller="headerController">
+				<div class="project-header-bar" ng-mouseover="showHeaderOpener=true" ng-mouseleave="showHeaderOpener=false">
+					<div class="project-header-opener" ng-show="!showHeader && showHeaderOpener" ng-click="showHeader=true">
+						<i class="fa fa-caret-down"></i>
+					</div>
+				</div>
+				<div class="project-content project-header" ng-show="showHeader">
+					<button type="button" class="close top-right" ng-click="showHeader=false">
+						<span aria-hidden="true">&times;</span><span class="sr-only">Close</span>
+					</button>
+					<div><span class="bold">{{projectCount()}}</span>
+						<ng-pluralize count="projectCount()"
+									when="{'one': ' project',
+										   'other': ' projects'}">
+						</ng-pluralize>
+					</div>
+					<div><span class="bold">{{countStories(true)}}</span> 
+						<ng-pluralize count="countStories(true)"
+									when="{'one': ' story completed',
+										   'other': ' stories completed'}">
+						</ng-pluralize>
+					</div>
+					<div><span class="bold">{{countStories(false)}}</span>
+						<ng-pluralize count="countStories(false)"
+									when="{'one': ' story in flight',
+										   'other': ' stories in flight'}">
+						</ng-pluralize> 
+					</div>
+					<div><span class="bold">{{contributors()}}</span>
+						<ng-pluralize count="contributors()"
+									when="{'one': ' contributor',
+										   'other': ' contributors'}">
+						</ng-pluralize> 
+					</div>
+				</div>
+			</li>
+	      	<li class="project-row" ng-repeat="project in projects" id="{{project.id}}" ng-show="project.included" ng-controller="projectController">
 		   		<div class="project-content">
 		   			<div class="column1">
 			   			<div class="project-icon-container">
@@ -160,6 +196,18 @@
 				<p>To view more details about an epic, click on the information button that appears on top of the epic you are
 				currently viewing. The epic details page displays displays a list of stories, a progress bar for the epic, and
 				a chart showing story creation and completion with a forecasted completion date for the epic. </p>
+				<h2>Source Code</h2>
+				<p>Epic Work View is open source. All source code is available on 
+					<a href="https://github.com/cobaltdev/epicworkview">GitHub</a>
+				under the 
+					<a href="https://github.com/cobaltdev/epicworkview/blob/master/LICENSE">BSD ISC licence</a>. 
+				</p>
+				<h2>Feedback</h2>
+				<p>We appreciate any feedback. Bugs, feature requests, or other issues can be filed
+					<a href="https://github.com/cobaltdev/epicworkview/issues">here</a>. 
+				If you would like to leave a review, please see our listing in the 
+					<a href="https://marketplace.atlassian.com/plugins/com.cobalt.jira.plugin.epic.EpicPlugin">Atlassian Marketplace</a>. 
+				</p>
 			</div>
 		</script>
     </div>

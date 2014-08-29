@@ -1,4 +1,4 @@
-angular.module('WorkView').controller('navBarController', ['$scope', '$filter', '$cookieStore', '$location', '$modal', 'ProjectsFactory', 'FullscreenFactory', function($scope, $filter, $cookieStore, $location, $modal, projectsFactory, fullscreenFactory){
+angular.module('WorkView').controller('navBarController', ['$scope', '$filter', '$cookieStore', '$location', '$modal', 'ProjectsFactory', 'FullscreenFactory', function($scope, $filter, $cookieStore, $location, $modal, projectsFactory, fullscreenFactory) {
     //all projects sorted in alpabetical order
     $scope.projects = [];
     //a subset of projects after being filtered by the current search term
@@ -10,8 +10,11 @@ angular.module('WorkView').controller('navBarController', ['$scope', '$filter', 
     //the current search term
     $scope.query = '';
 
+    $scope.firstChar = true;
+
     /*----- Project Filtering -----*/
 
+    // return whether the given item should be included for this query
     $scope.search = function(item) {
         var query = $scope.query.toLowerCase();
         var group = item.group.toLowerCase();
@@ -91,8 +94,19 @@ angular.module('WorkView').controller('navBarController', ['$scope', '$filter', 
         $cookieStore.remove('projectIds');
         $cookieStore.put('projectIds', $scope.uncheckedProjectIds);
 
-        var idString = $scope.uncheckedProjectIds.join();
+        var idString = '';
+        if ($scope.uncheckedProjectIds) {
+        	idString = $scope.uncheckedProjectIds.join();
+        }
         $location.search('ids', idString);
+    };
+
+    // clear all checkboxes on initial typing
+    $scope.initialClear = function() {
+        if($scope.firstChar) {
+            $scope.firstChar = false;
+            $scope.clearCheckboxes();
+        }
     };
 
     /*----- Time Filtering -----*/
@@ -134,23 +148,28 @@ angular.module('WorkView').controller('navBarController', ['$scope', '$filter', 
 
     /*----- controller initialization code -----*/
 
-    //initialize the filtered project ids to what is stored in the cookie
-    $scope.uncheckedProjectIds = $cookieStore.get('projectIds');
-    if($scope.uncheckedProjectIds === undefined) {
-        $scope.uncheckedProjectIds = [];
-        $cookieStore.put('projectIds', $scope.uncheckedProjectIds);
-    }
+    $scope.init = function() {
+        //initialize the filtered project ids to what is stored in the cookie
+        $scope.uncheckedProjectIds = $cookieStore.get('projectIds');
+        // sometimes gets set to '' instead of undefined, not sure why
+        if($scope.uncheckedProjectIds === undefined || $scope.uncheckedProjectIds === '') {
+            $scope.uncheckedProjectIds = [];
+            $cookieStore.put('projectIds', $scope.uncheckedProjectIds);
+        }
 
-    //will reinitialize the filtered projects to the given ids
-    var urlFilterIds = $location.search().ids;
-    if(urlFilterIds !== undefined && urlFilterIds.length > 0) {
-        var ids = urlFilterIds.split(',');
-        $scope.uncheckedProjectIds = [];
+        //will reinitialize the filtered projects to the given ids
+        var urlFilterIds = $location.search().ids;
+        if(urlFilterIds !== undefined && urlFilterIds.length > 0) {
+            var ids = urlFilterIds.split(',');
+            $scope.uncheckedProjectIds = [];
 
-        angular.forEach(ids, function(id) {
-            $scope.uncheckedProjectIds.push(parseInt(id));
-        });
-    }
+            angular.forEach(ids, function(id) {
+                $scope.uncheckedProjectIds.push(parseInt(id));
+            });
+        }
 
-    $scope.cookieState();
+        $scope.cookieState();
+    };
+
+    $scope.init();
 }]);

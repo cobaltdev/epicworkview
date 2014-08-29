@@ -1,4 +1,25 @@
-describe('ProjectController', function(){
+describe('Unit: Context Tests', function() {
+    beforeEach(function() {
+        $('head').append('<meta name="ajs-context-path" content="/jira"></meta>');
+        module('WorkView');
+    });
+
+    afterEach(function() {
+        $('meta[name="ajs-context-path"]').remove();
+    });
+
+    it('can get an instance of the context factory', inject(function(Context) {
+        expect(Context).toBeDefined();
+    }));
+
+    it('should return the current context for the application', inject(function(Context) {
+        expect(Context).toEqual('/jira');
+    }));
+});
+
+
+
+/*describe('ProjectController', function(){
     var scope;//we'll use this scope in our tests
     var httpBackend, http, controller, cookieStore;
     var projects, alphabeticalProjects, project1;
@@ -254,9 +275,4 @@ describe('EpicController', function(){
     it('should not initially be clicked', function(){
     	expect(scope.clickedEpic).toBeFalsy();
     });
-});   
-    
-
-
-          
-      
+});*/

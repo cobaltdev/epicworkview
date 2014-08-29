@@ -59,6 +59,7 @@ function epicDetailsController ($scope, $http, $q, $location, $window) {
     epicQuery += '/' + $scope.key;
     storiesQuery += ' order by resolutiondate desc';
 
+    // Get the information to displayed in the page
     $q.all([
         $http.get(epicQuery),
         $http.get(storiesQuery),
@@ -185,21 +186,21 @@ function epicDetailsController ($scope, $http, $q, $location, $window) {
         angular.forEach(stories, function(story) {
             var value = $scope.getValue(story, $scope.workType);
             list.push({
-                date: Date.parse(story.fields.created),
+                date: moment(story.fields.created),
                 number: value
             });
 
             var resolution = story.fields.resolutiondate;
             if(resolution !== undefined && resolution !== null) {
                 list.push({
-                    date: Date.parse(story.fields.resolutiondate),
+                    date: moment(story.fields.resolutiondate),
                     number: -value
                 });
             }
         });
 
         list.push({
-            date: new Date().getTime(),
+            date: Date.now(),
             number: 0
         });
 
@@ -228,32 +229,7 @@ function epicDetailsController ($scope, $http, $q, $location, $window) {
         }
     };
 
-    // return the average length of a story from creation to completion, in hours
-    function getAverageTime(stories) {
-        var completedStories = 0;
-        var sumTime = 0;
-
-        var day = 1000 * 60 * 60 * 24;
-        var week = day * 7;
-
-        angular.forEach(stories, function(story) {
-            if(story.fields.resolutiondate !== null) {
-                completedStories++;
-                var completedTime = Date.parse(story.fields.resolutiondate) - Date.parse(story.fields.created);
-
-                completedTime -= (2 * day * Math.floor(completedTime / week));
-                completedTime /= 3;
-
-                sumTime+= completedTime;
-            }
-        });
-
-        if(completedStories !== 0) {
-            return (sumTime/(completedStories* 60 * 60 * 1000));
-        }
-        return 0;
-    }
-
+    
     // format the given value for display
     $scope.format = function(number) {
         if ($scope.workType === 3) {
@@ -267,7 +243,7 @@ function epicDetailsController ($scope, $http, $q, $location, $window) {
         var storyNum = 0;       		
 		
         angular.forEach(stories, function(story) {
-            if(story.fields.resolutiondate !== null && Date.parse(story.fields.resolutiondate) >= cutoffDate) {
+            if(story.fields.resolutiondate !== null && moment(story.fields.resolutiondate) >= cutoffDate) {
                 storyNum += $scope.getValue(story, $scope.workType);
             }
         });
@@ -360,7 +336,7 @@ function epicDetailsController ($scope, $http, $q, $location, $window) {
         // add to each point for each story in that range section
         angular.forEach($scope.stories, function(story) {
             // if creation is true, use story's created date. Otherwise, use resolution date
-            var date = Date.parse(creation ? story.fields.created : story.fields.resolutiondate);
+            var date = moment(creation ? story.fields.created : story.fields.resolutiondate);
             // add to the point
             if (date > min && date < max) {
                 var i = Math.floor((date - min) / range) + 1;
@@ -373,7 +349,7 @@ function epicDetailsController ($scope, $http, $q, $location, $window) {
     //nicely format the date string
     $scope.formatResolutionDate = function(date) {
         if(date !== undefined && date !== null) {
-            return 'resolved: ' + new Date(Date.parse(date)).toLocaleString();
+            return 'resolved: ' + moment(date).format('MMMM Do YYYY, h:mm:ss a');
         }
         else {
             return 'unresolved';
@@ -397,6 +373,32 @@ function epicDetailsController ($scope, $http, $q, $location, $window) {
             return "Story Points";
         case 3:
             return "Work Hours";
+        default:
+            return "Unknown";
+        }
+    };
+    
+    // return a string representation of the work type
+    $scope.workTypeToString = function(number) {
+        switch($scope.workType) {
+        case 1:{
+        	if (number === 1){
+        		return "Story";
+        	}
+            return "Stories";
+        }
+        case 2:{
+        	if (number === 1){
+        		return "Story Point";
+        	}        
+            return "Story Points";
+        }
+        case 3:{
+        	if (number === 1){
+        		return "Work Hour";
+        	}
+            return "Work Hours";
+        }
         default:
             return "Unknown";
         }
@@ -590,7 +592,7 @@ function chartDirective() {
 						    msg += "From " + new Date(previousx).toLocaleDateString() + " to ";
 					    }
 
-                  	    msg += new Date(x).toLocaleDateString() + "<br/><strong>" + scope.format(y) + "</strong>" + " " + scope.workTypeToString();
+                  	    msg += new Date(x).toLocaleDateString() + "<br/><strong>" + scope.format(y) + "</strong>" + " " + scope.workTypeToString(y);
 
                   	    if (item.seriesIndex === 2){
                             msg += " Created";
@@ -623,8 +625,8 @@ function chartDirective() {
             function zoom(min, max) {
                 scope.stories = [];
                 angular.forEach(scope.fullStories, function(story) {
-                    var created = Date.parse(story.fields.created);
-                    var resolved = story.fields.resolutiondate !== null ? Date.parse(story.fields.resolutiondate) : null;
+                    var created = moment(story.fields.created);
+                    var resolved = story.fields.resolutiondate !== null ? moment(story.fields.resolutiondate) : null;
                     if (created <= max && (resolved === null || resolved >= min)) {
                         scope.stories.push(story);
                     }

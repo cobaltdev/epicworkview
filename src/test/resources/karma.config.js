@@ -15,12 +15,12 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-      'angular.js',
-      'angular-mocks.js',
-      'angular-cookies.js',
-      'jquery-1.7.2.js',
+      'libs/angular.js',//angular need to be loaded before everything
+      'libs/**/*.js',
+      '../../main/resources/js/factories/DateFactory.js',
       '../java/ut/com/cobalt/jira/plugin/epic/test/*Spec.js',
-      '../../main/resources/js/*.js' 
+      'tests/**/*.js',
+      '../../main/resources/js/**/*.js'
     ],
 
 
@@ -31,28 +31,33 @@ module.exports = function(config) {
 
     plugins:[
      'karma-jasmine',
+//     'karma-junit-reporter',
      'karma-coverage',
      'karma-phantomjs-launcher',
-     'karma-chrome-launcher',
-     ],
+     'karma-chrome-launcher'
+    ],
 
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
-      '../../main/resources/js/Epic*.js': 'coverage'
+      '../../main/resources/js/**/*.js': 'coverage'
     },
 
     coverageReporter: {
-      type: 'lcovonly',
+      type: 'lcov',
       dir: '../../../target/coverage/',
       subdir: '.'
     },
+
+//    junitReporter: {
+//        outputFile: '../../../target/test-reports/test-results.xml'
+//    },
 
 
     // test results reporter to use
     // possible values: 'dots', 'progress'
     // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-    reporters: ['progress', 'coverage'],
+    reporters: ['progress', /*'junit',*/ 'coverage'],
 
     // web server port
     port: 9876,

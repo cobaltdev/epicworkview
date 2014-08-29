@@ -49,8 +49,8 @@
 }
 
 .epic-dropdown-menu {
-	right: 0 !important;
-	left: initial !important;
+	max-height: 500px;
+	overflow-y: auto;
 }
 
 /* Graph */
@@ -199,10 +199,13 @@
 	padding: 10px;
 	background: white;
 	overflow: hidden;
+	font-size: 13pt;
 }
 
 .story-comment > span {
 	margin-right: 20px;
+	font-size: 11pt;
+	font-style: italic;
 }
 
 .story-row {
@@ -215,4 +218,9 @@
 
 .story-contributor {
 	float: right;
+}
+
+.stories-completed {
+	margin-left: 66px;
+	font-weight: bold;
 }

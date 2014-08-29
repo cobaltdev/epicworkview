@@ -194,10 +194,6 @@
                         <configuration>
                             <target>
                                 <echo>NPM Install</echo>
-                                <exec executable="npm" dir="${project.basedir}" osfamily="unix" resultproperty="">
-                                    <env key="PATH" value="/usr/local/bin:/usr/bin:/bin"/>
-                                    <arg line="config set registry http://artifactory.cobalt.com/artifactory/api/npm/npm-repo"/>
-                                </exec>
                                 <echo>Pulling down node modules...</echo>
                                 <exec executable="npm" dir="${project.basedir}" osfamily="unix" resultproperty="npm.result" output="npm.status">
                                     <env key="PATH" value="/usr/local/bin:/usr/bin:/bin"/>
